@@ -3,7 +3,17 @@ const db = require('../data/helpers/userDb.js');
 
 const router = express.Router();
 
-router.post('/', (req, res) => {
+function capitalize(req, res, next) {
+  if (req.body.name) {
+    const upperName = req.body.name;
+    req.upperName = upperName.toUpperCase();
+    next();
+  } else {
+    res.status(400).json({ message: 'Please supply a name' });
+  }
+}
+
+router.post('/', capitalize, (req, res) => {
   const { name } = req.body;
   const newUser = { name };
   if (!name) {
@@ -16,6 +26,7 @@ router.post('/', (req, res) => {
       res.status(201).json(user);
     })
     .catch(err => {
+      console.log(err);
       res.status(500).json({
         error: 'There was an error while saving the user to the database'
       });
@@ -57,7 +68,6 @@ router.get('/userpost/:id', (req, res) => {
   const { id } = req.params;
   db.getUserPosts(id)
     .then(posts => {
-      console.log(posts);
       if (posts.length > 0) {
         res.status(200).json(posts);
       } else {
