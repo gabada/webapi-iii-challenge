@@ -5,8 +5,7 @@ const router = express.Router();
 
 function capitalize(req, res, next) {
   if (req.body.name) {
-    const upperName = req.body.name;
-    req.upperName = upperName.toUpperCase();
+    req.body.name = req.body.name.toUpperCase();
     next();
   } else {
     res.status(400).json({ message: 'Please supply a name' });
@@ -14,19 +13,11 @@ function capitalize(req, res, next) {
 }
 
 router.post('/', capitalize, (req, res) => {
-  const { name } = req.body;
-  const newUser = { name };
-  if (!name) {
-    res.status(400).json({
-      errorMessage: 'Please provide a name for the user.'
-    });
-  }
-  db.insert(newUser)
+  db.insert(req.body)
     .then(user => {
       res.status(201).json(user);
     })
     .catch(err => {
-      console.log(err);
       res.status(500).json({
         error: 'There was an error while saving the user to the database'
       });
@@ -79,15 +70,9 @@ router.get('/userpost/:id', (req, res) => {
     });
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', capitalize, (req, res) => {
   const { id } = req.params;
-  const { name } = req.body;
-  const updatedInfo = { name };
-  if (!name) {
-    res.status(400).json({
-      errorMessage: 'Please provide a name for the new user.'
-    });
-  }
+  const updatedInfo = req.body;
   db.getById(id).then(name => {
     if (!name) {
       res
