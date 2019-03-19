@@ -53,6 +53,22 @@ router.get('/:id', (req, res) => {
     });
 });
 
+router.get('/userpost/:id', (req, res) => {
+  const { id } = req.params;
+  db.getUserPosts(id)
+    .then(posts => {
+      console.log(posts);
+      if (posts.length > 0) {
+        res.status(200).json(posts);
+      } else {
+        res.status(404).json({ message: 'No posts found for that user!' });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ error: 'The posts could not be retrieved' });
+    });
+});
+
 router.put('/:id', (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
