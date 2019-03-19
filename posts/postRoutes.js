@@ -38,7 +38,7 @@ router.get('/:id', (req, res) => {
   const { id } = req.params;
   db.getById(id)
     .then(post => {
-      if (post.id) {
+      if (post) {
         res.status(200).json(post);
       } else {
         res
@@ -62,23 +62,18 @@ router.put('/:id', (req, res) => {
       errorMessage: 'Please provide text and user_id for the post.'
     });
   }
-  db.update(id, updatedInfo)
-    .then(updatePost => {
-      if (!id) {
-        res
-          .status(404)
-          .json({ message: 'The post with the specified ID does not exist.' });
-      } else {
-        db.getById(id).then(post => {
-          res.status(201).json(post);
-        });
-      }
-    })
-    .catch(err => {
+  db.getById(id).then(post => {
+    if (!post) {
       res
-        .status(500)
-        .json({ error: 'The post information could not be modified.' });
+        .status(404)
+        .json({ message: 'The post with the specified ID does not exist.' });
+    }
+    db.update(id, updatedInfo).then(updatePost => {
+      db.getById(id).then(newPost => {
+        res.status(201).json(newPost);
+      });
     });
+  });
 });
 
 router.delete('/:id', (req, res) => {
