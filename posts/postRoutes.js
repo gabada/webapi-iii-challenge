@@ -6,7 +6,7 @@ const router = express.Router();
 router.post('/', (req, res) => {
   const { text, user_id } = req.body;
   const newPost = { text, user_id };
-  if (!text || !user_id) {
+  if (!text && !user_id) {
     res.status(400).json({
       errorMessage: 'Please provide text and user_id for the post.'
     });
@@ -57,7 +57,7 @@ router.put('/:id', (req, res) => {
   const { id } = req.params;
   const { text, user_id } = req.body;
   const updatedInfo = { text, user_id };
-  if (!text || !user_id) {
+  if (!text && !user_id) {
     res.status(400).json({
       errorMessage: 'Please provide text and user_id for the post.'
     });
